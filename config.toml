@@ -31,6 +31,7 @@ subtitle = "blog"
 # e.g. disqus, utterances, ovo.
 # comment = "utterances"
 comment = "disqus"
+shortname = "blackshirt"
 
 # Timeformat, no matter what format to use, make it the second day of Jan. 2006
 timeformat = "Jan 02, 2006"
