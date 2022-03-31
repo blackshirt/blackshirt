@@ -73,7 +73,23 @@ If we look at above pseudocode, its looks nasty and simple. All the complexity i
 >Using the same key to generate tags for multiple messages allows an attacker to forge tags. Always generate a new key per message you want to authenticate. If you are using this as a MAC for symmetric encryption please use `chacha20poly1305` instead.
 
 ### State of poly1305 module for V language
-Luckily, we have  pure v `poly1305` module for V language recently. If you wanna to try, its availables at my github repos at [poly1305](https://github.com/blackshirt/poly1305.git)
+Luckily, we already have working `poly1305` module in pure V recently. If you wanna to try, you can look and read it on github repos at [poly1305](https://github.com/blackshirt/poly1305.git). As a notice, even its pass the tests from RFC test vectors, its not proven in productions and maybe still contains some buggy things.
 
 > **⛔ DANGER**: 
 >Security and cryptography was considerabled as “Hazardous Materials” module. You should **ONLY** use it if you’re 100% absolutely sure that you know what you’re doing because this module was written and provided as is without any guarantees and risks in your own. Just looks at the code and see what happens in it. 
+
+Let's take break a down the pseudocode into real code. I'm not going to the technical detail about internal machinery of poly1305, if you wanna to know in depth and detail, you should read original papers from DJ Bernstein [poly1305.pdf](https://cr.yp.to/mac/poly1305-20050329.pdf), and read for this great writing from Loup Vaillant blog, [poly1305-design](https://loup-vaillant.fr/tutorials/poly1305-design).
+
+#### Take look in a depth
+The V's poly1305 module fundamentally contains two basic functions:
+- `create_mac(msg, key)`  
+- `verify_mac(mac, msg, key)`
+
+`create_mac` function intended to create 16 byte length of tag/mac, where msg was messages you want to auth and key was **one-time** key you should provide, where `verify_mac` was for verifying mac provided with msg and key supplied, its return true when valid and false otherwise.
+
+> **Note**: the function provided in the poly1305 module maybe changed in the future.
+
+Under the hood, for creating tag/mac with `create_mac` its consists of step :
+- initialize poly1305 state by calling `new_with_key(key)` function.
+- feed poly1305 state by supplying its with messages want to auth, by calling `write(msg)` method.
+- and finally, calling `finalize()` on the poly1305 state to return tag as a result.
